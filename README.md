@@ -1,9 +1,10 @@
 # Project Setup
 ## Requirements:
-* Node, NPM, and NPX
-* React (installed using 'create-react-app')
-* Lodash
-* Material UI
+* Node = v16.14.0
+* NPM and NPX = 8.5.2
+* React (installed using 'create-react-app') = 17.0.2
+* Lodash = 4.17.21
+* Material UI = 5.4.3
 ## Getting Started:
 1. Clone the repo to the desired local directory
 2. Run the command 'npm install' to install the dependencies
