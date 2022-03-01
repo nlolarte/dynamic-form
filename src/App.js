@@ -9,18 +9,76 @@ import "./App.css";
 const App = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isFormFrozen, setIsFormFrozen] = useState(false);
   const [formFields, setFormFields] = useState([]);
+  const [postResult, setPostResult] = useState({});
+  const [state, setState] = useState({
+    firstName: "",
+    lastName: "",
+    emailAddress: "",
+    gender: "",
+    age: 0,
+    testimonial: ""
+  });
+
+  const storeData = (formFields) => {
+    const fields = {};
+    for (let field of formFields) {
+      fields[field.fieldName] = field.value
+    }
+    setState(fields);
+  };
+
+  const postData = () => {
+    fetch("https://vb-react-exam.netlify.app/api/form", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...state
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setPostResult(result)
+        setIsFormFrozen(false);
+      })
+      .catch((err) => {
+        setError(err);
+      });
+  }
+
+  const handleChange = (event) => {
+    const name = event.target.name
+    const value = event.target.value
+
+    if (postResult) {
+      setPostResult({});
+    }
+    setState({
+      ...state,
+      [name]: value
+    });
+  }
+
+  const handleSubmit = () => {
+    setIsFormFrozen(true);
+    postData();
+  }
 
   const renderFormField = (formField) => {
     switch(formField.type) {
       case "select":
         return (
           <TextField
-            id={formField.fieldName}
+            name={formField.fieldName}
             select
             label={lodash.startCase(formField.fieldName)}
-            value={formField.value}
+            value={state[formField.fieldName] || ""}
             variant="filled"
+            onChange={handleChange}
+            disabled={isFormFrozen}
           >
             {formField.options.map((option) => (
               <MenuItem key={option} value={option}>{lodash.startCase(option)}</MenuItem>
@@ -30,40 +88,47 @@ const App = () => {
       case "multiline":
         return (
           <TextField
-            id={formField.fieldName}
+            name={formField.fieldName}
             multiline
             type={formField.type}
             label={lodash.startCase(formField.fieldName)}
-            value={formField.value}
+            value={state[formField.fieldName] || ""}
             variant="filled"
+            onChange={handleChange}
+            disabled={isFormFrozen}
           />
         )
       default:
         return (
           <TextField
-            id={formField.fieldName}
+            name={formField.fieldName}
             type={formField.type}
             label={lodash.startCase(formField.fieldName)}
-            value={formField.value}
+            value={state[formField.fieldName] || ""}
             variant="filled"
+            onChange={handleChange}
+            disabled={isFormFrozen}
           />
         )
     }
   }
 
   useEffect(() => {
-    fetch("https://vb-react-exam.netlify.app/api/form")
+    fetch("https://vb-react-exam.netlify.app/api/form", {
+      method: "GET",
+    })
       .then((res) => res.json())
-      .then(
-        (data) => {
+      .then((result) => {
+        if (result.success) {
           setIsLoaded(true);
-          setFormFields(data.data);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
+          setFormFields(result.data);
+          storeData(result.data);
         }
-      );
+      })
+      .catch((err) => {
+        setIsLoaded(true);
+        setError(err);
+      });
   }, []);
 
   if (error) {
@@ -79,17 +144,27 @@ const App = () => {
         }}
         noValidate
       >
+        <h1>Dynamic Form</h1>
         {formFields.map((formField) => (
-          <div>
+          <div key={formField.fieldName}>
             {renderFormField(formField)}
           </div>
         ))}
-        <Button variant="contained">
+        <Button variant="contained" onClick={handleSubmit} disabled={isFormFrozen}>
           Submit
         </Button>
+        {Object.entries(postResult).length
+          ?
+            <div>
+              <h1>Response</h1>
+              <p>{JSON.stringify(postResult)}</p>
+            </div>
+          :
+            null
+        }
       </Box>
     );
-  }
+  };
 };
 
 export default App;
