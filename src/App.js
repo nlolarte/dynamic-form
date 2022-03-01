@@ -79,6 +79,7 @@ const App = () => {
             variant="filled"
             onChange={handleChange}
             disabled={isFormFrozen}
+            align="left"
           >
             {formField.options.map((option) => (
               <MenuItem key={option} value={option}>{lodash.startCase(option)}</MenuItem>
@@ -96,6 +97,7 @@ const App = () => {
             variant="filled"
             onChange={handleChange}
             disabled={isFormFrozen}
+            align="left"
           />
         )
       default:
@@ -108,6 +110,7 @@ const App = () => {
             variant="filled"
             onChange={handleChange}
             disabled={isFormFrozen}
+            align="left"
           />
         )
     }
@@ -137,32 +140,34 @@ const App = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-        }}
-        noValidate
-      >
-        <h1>Dynamic Form</h1>
-        {formFields.map((formField) => (
-          <div key={formField.fieldName}>
-            {renderFormField(formField)}
-          </div>
-        ))}
-        <Button variant="contained" onClick={handleSubmit} disabled={isFormFrozen}>
-          Submit
-        </Button>
-        {Object.entries(postResult).length
-          ?
-            <div>
-              <h1>Response</h1>
-              <p>{JSON.stringify(postResult)}</p>
+      <div className="App">
+        <Box
+          component="form"
+          sx={{
+            '& .MuiTextField-root': { m: 1, width: '100ch' },
+          }}
+          noValidate
+        >
+          <h1>Dynamic Form</h1>
+          {formFields.map((formField) => (
+            <div key={formField.fieldName}>
+              {renderFormField(formField)}
             </div>
-          :
-            null
-        }
-      </Box>
+          ))}
+          <Button variant="contained" onClick={handleSubmit} disabled={isFormFrozen}>
+            Submit
+          </Button>
+          {Object.entries(postResult).length
+            ?
+              <div className="App-response" align="left">
+                <h3>Response</h3>
+                <p>{JSON.stringify(postResult)}</p>
+              </div>
+            :
+              null
+          }
+        </Box>
+      </div>
     );
   };
 };

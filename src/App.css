@@ -2,6 +2,11 @@
   text-align: center;
 }
 
+.App-response {
+  margin-right: 2.5in;
+  margin-left: 2.5in;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
